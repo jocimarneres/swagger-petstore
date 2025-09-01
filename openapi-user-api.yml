@@ -1,0 +1,1543 @@
+openapi: 3.0.0
+paths:
+  /user-api/v1/user:
+    post:
+      operationId: create-user
+      summary: Create user
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserDto'
+      responses:
+        '201':
+          description: User successfully created
+        '409':
+          description: User already exists
+      tags:
+        - user
+    get:
+      operationId: find-all-users
+      summary: Find all users
+      parameters:
+        - name: page
+          required: false
+          in: query
+          schema:
+            example: 1
+        - name: limit
+          required: false
+          in: query
+          schema:
+            example: 10
+        - name: search
+          required: false
+          in: query
+          description: Search like name, lastName, email, externalRefId or flowUserId
+          schema: {}
+        - name: project
+          required: false
+          in: query
+          description: Fields to project
+          schema:
+            example: name lastName email
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponseDto'
+                  - properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AppUserDto'
+      tags:
+        - user
+  /user-api/v1/user/email:
+    get:
+      operationId: find-user-by-email
+      summary: Find user by email
+      parameters:
+        - name: address
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '404':
+          description: User not found
+      tags:
+        - user
+    patch:
+      operationId: update-user-email
+      summary: Update user email
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserEmailDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - user
+  /user-api/v1/user/{id}:
+    get:
+      operationId: find-user-by-id
+      summary: Find user by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '404':
+          description: User not found
+      tags:
+        - user
+    delete:
+      operationId: remove-user
+      summary: Remove user by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User successfully removed
+        '404':
+          description: User not found
+      tags:
+        - user
+    patch:
+      operationId: update-user
+      summary: Update user by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserDto'
+      responses:
+        '200':
+          description: ''
+      tags:
+        - user
+  /user-api/v1/user/{id}/role/{roleId}:
+    delete:
+      operationId: remove-role
+      summary: Remove role by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: roleId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Role successfully removed
+        '404':
+          description: User or role not found
+      tags:
+        - user
+  /user-api/v1/user/{id}/role:
+    get:
+      operationId: find-user-role-by-id
+      summary: Find user role by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User successfully retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserRoleResponse'
+        '404':
+          description: User not found
+      tags:
+        - user
+    post:
+      operationId: add-role-to-user
+      summary: Add role to user by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddRoleToUserDto'
+      responses:
+        '201':
+          description: ''
+      tags:
+        - user
+  /user-api/v1/user/{id}/groups:
+    get:
+      operationId: find-all-user-groups
+      summary: Find all user groups by id or flowUserId
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GetUserGroupsResponse'
+        '403':
+          description: User does not have permission to view groups
+        '404':
+          description: User not found
+      tags:
+        - user
+  /user-api/v1/role/{id}/memberOf:
+    get:
+      operationId: find-members-of-role
+      summary: Find members of role
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          schema:
+            example: 1
+        - name: limit
+          required: false
+          in: query
+          schema:
+            example: 10
+        - name: search
+          required: false
+          in: query
+          description: Search like name, lastName, email, externalRefId or flowUserId
+          schema: {}
+        - name: project
+          required: false
+          in: query
+          description: Fields to project
+          schema:
+            example: name lastName email
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponseDto'
+                  - properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AppUserDto'
+        '404':
+          description: Members not found
+      tags:
+        - role
+  /user-api/v1/user/{id}/group/{groupId}/validate:
+    get:
+      operationId: validate-user-group
+      summary: Validate user group by id or flowUserId
+      parameters:
+        - name: flowChannel
+          in: header
+          description: The channel
+          required: false
+          schema:
+            type: string
+        - name: flowAgent
+          in: header
+          description: The agent
+          required: false
+          schema:
+            type: string
+        - name: flowModel
+          in: header
+          description: The model
+          required: false
+          schema:
+            type: string
+        - name: flowOperationId
+          in: header
+          description: The operation id
+          required: false
+          schema:
+            type: string
+        - name: flowGroupId
+          in: header
+          description: The group id
+          required: false
+          schema:
+            type: string
+        - name: flowGroup
+          in: header
+          description: The group
+          required: false
+          schema:
+            type: string
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: groupId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Group is valid
+        '400':
+          description: Invalid Params
+        '404':
+          description: User or group not found
+      tags:
+        - user
+  /user-api/v1/agent/{id}/memberOf:
+    delete:
+      operationId: remove-members-of-agent
+      summary: Remove members of agent
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Members successfully removed
+        '404':
+          description: Members not found
+      tags:
+        - agent
+  /user-api/v1/group:
+    post:
+      operationId: create-group
+      summary: Create group
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupDto'
+      responses:
+        '201':
+          description: Group successfully created
+        '409':
+          description: Group already exists
+      tags:
+        - group
+    get:
+      operationId: find-all-groups
+      summary: Find all groups
+      parameters:
+        - name: active
+          required: false
+          in: query
+          schema:
+            example: 'true'
+        - name: ids
+          required: false
+          in: query
+          description: Array of ids (comma separated)
+          schema: {}
+        - name: search
+          required: false
+          in: query
+          description: Search by name
+          schema: {}
+        - name: limit
+          required: false
+          in: query
+          schema:
+            example: 10
+        - name: page
+          required: false
+          in: query
+          schema:
+            example: 1
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponseDto'
+                  - properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/GroupResponsePaginated'
+      tags:
+        - group
+  /user-api/v1/group/{id}:
+    patch:
+      operationId: update-group
+      summary: Update group
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupDto'
+      responses:
+        '201':
+          description: Group successfully updated
+        '409':
+          description: Group already exists
+      tags:
+        - group
+    get:
+      operationId: find-a-group
+      summary: Find a group
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupResponse'
+        '404':
+          description: Group not found
+      tags:
+        - group
+    delete:
+      operationId: delete-group
+      summary: Delete group
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Group successfully deleted
+      tags:
+        - group
+  /user-api/v1/api-key:
+    post:
+      operationId: create-api-key
+      summary: Create api-key
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateApiKeyDto'
+      responses:
+        '201':
+          description: Api-key successfully created
+      tags:
+        - api-key
+    get:
+      operationId: get-api-keys
+      summary: Get user's api keys
+      parameters:
+        - name: active
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          schema:
+            example: 1
+        - name: limit
+          required: false
+          in: query
+          schema:
+            example: 10
+        - name: search
+          required: false
+          in: query
+          description: Search like name or client id
+          schema: {}
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/PaginatedResponseDto'
+                  - properties:
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/ApiKeyDto'
+        '404':
+          description: User not found
+      tags:
+        - api-key
+  /user-api/v1/api-key/{clientId}:
+    get:
+      operationId: get-user-by-client-id
+      summary: Get user data by client id
+      parameters:
+        - name: clientId
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '404':
+          description: Api-key or user not found
+      tags:
+        - api-key
+  /user-api/v1/api-key/{id}:
+    delete:
+      operationId: delete-api-key
+      summary: Delete api-key
+      parameters:
+        - name: id
+          required: true
+          in: path
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Api-key successfully deleted
+      tags:
+        - api-key
+  /user-api/v1/user/term/available:
+    get:
+      operationId: get-user-terms
+      summary: Get terms not accepted for user
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TermVersionsDto'
+        '404':
+          description: User not found
+      tags:
+        - terms
+  /user-api/v1/user/term/{termId}/accept:
+    post:
+      operationId: accept-term
+      summary: Accept term
+      parameters:
+        - name: termId
+          required: true
+          in: path
+          schema:
+            type: string
+        - name: FlowChannel
+          in: header
+          required: true
+          schema:
+            enum:
+              - portal
+              - cli
+              - intellij
+              - vscode
+            type: string
+      responses:
+        '201':
+          description: Term successfully accepted
+        '409':
+          description: User already accepted this term
+      tags:
+        - terms
+  /user-api/v1/health:
+    get:
+      operationId: simple-health-check
+      summary: Health check that return only status OK
+      parameters: []
+      responses:
+        '200':
+          description: ''
+      tags:
+        - health
+  /user-api/v1/healthz:
+    get:
+      operationId: full-health-check
+      summary: Health check that verify database connectivity and env vars
+      parameters: []
+      responses:
+        '200':
+          description: The Health Check is successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  info:
+                    type: object
+                    example:
+                      database:
+                        status: up
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  error:
+                    type: object
+                    example: {}
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  details:
+                    type: object
+                    example:
+                      database:
+                        status: up
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+        '503':
+          description: The Health Check is not successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: error
+                  info:
+                    type: object
+                    example:
+                      database:
+                        status: up
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  error:
+                    type: object
+                    example:
+                      redis:
+                        status: down
+                        message: Could not connect
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+                    nullable: true
+                  details:
+                    type: object
+                    example:
+                      database:
+                        status: up
+                      redis:
+                        status: down
+                        message: Could not connect
+                    additionalProperties:
+                      type: object
+                      required:
+                        - status
+                      properties:
+                        status:
+                          type: string
+                      additionalProperties: true
+      tags:
+        - health
+  /user-api/v1/agents-management:
+    get:
+      operationId: get-agents-management
+      summary: Get agents management
+      parameters:
+        - name: search
+          required: false
+          in: query
+          schema:
+            enum:
+              - prompt
+              - dashboard
+              - plugin
+            type: string
+      responses:
+        '200':
+          description: ''
+      tags:
+        - agents-management
+  /user-api/v1/memory:
+    post:
+      operationId: create-memory
+      summary: Create a memory for an user
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFlowMemoryDto'
+      responses:
+        '204':
+          description: Memory created successfully
+      tags:
+        - memory
+    get:
+      operationId: get-memory
+      summary: Retrieve a user's memory
+      parameters:
+        - name: subDomain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: ownerId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: identifier
+          required: true
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User memory successfully recovered
+        '400':
+          description: Invalid request parameters
+      tags:
+        - memory
+    patch:
+      operationId: disable-memory
+      summary: Disable a user's memory
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FlowMemoryDto'
+      responses:
+        '204':
+          description: User memory successfully disabled
+        '400':
+          description: Invalid request parameters
+      tags:
+        - memory
+  /user-api/v1/memory/search:
+    get:
+      operationId: search-memories
+      summary: Search for user memories
+      parameters:
+        - name: subDomain
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: ownerId
+          required: true
+          in: query
+          schema:
+            type: string
+        - name: identifier
+          required: false
+          in: query
+          schema:
+            type: string
+        - name: pageNumber
+          required: false
+          in: query
+          schema:
+            default: '1'
+            type: number
+      responses:
+        '200':
+          description: Flow Memories retrieved successfully
+        '400':
+          description: Invalid request parameters
+      tags:
+        - memory
+  /user-api/v1/acu-events/sync:
+    post:
+      operationId: sync-acu-events
+      summary: Sync ACU events with databricks
+      parameters: []
+      responses:
+        '201':
+          description: Sync ACU events  successfully
+      tags:
+        - ACU
+  /user-api/v1/acu-events/report:
+    get:
+      operationId: get-acu-events
+      summary: Retrieve ACU report details for a specific month and year
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+      responses:
+        '200':
+          description: ACU report details retrieved successfully
+        '400':
+          description: Invalid month or year provided
+      tags:
+        - ACU
+  /user-api/v2/acu-events/sync:
+    post:
+      operationId: sync-acu-events v2
+      summary: Sync ACU events daily and monthly with databricks
+      parameters: []
+      responses:
+        '201':
+          description: Sync ACU events successfully
+      tags:
+        - ACU
+  /user-api/v2/acu-events/consumption-history:
+    get:
+      operationId: get-acu-events-consumption-history
+      summary: Get ACU Events consumption history given params
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+        - name: groupBy
+          required: true
+          in: query
+          description: Type of grouping that should be used
+          schema:
+            example: month
+      responses:
+        '200':
+          description: Successfully found consumption history
+      tags:
+        - ACU
+  /user-api/v2/acu-events/count:
+    get:
+      operationId: get-acu-events-count
+      summary: Get ACU Events count given params
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+        - name: groupBy
+          required: true
+          in: query
+          description: Type of grouping that should be used
+          schema:
+            example: month
+      responses:
+        '200':
+          description: Successfully found get count
+      tags:
+        - ACU
+  /user-api/v2/acu-events/detailed-consumption:
+    get:
+      operationId: get-acu-detailed-consumption
+      summary: Retrieve ACU detailed consumption for given filters
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+        - name: groupBy
+          required: true
+          in: query
+          description: Type of grouping that should be used
+          schema:
+            example: month
+        - name: orderBy
+          required: true
+          in: query
+          description: Field to sort the results by
+          schema:
+            example: eventDate
+        - name: orderDirection
+          required: true
+          in: query
+          description: Sorting order for the results
+          schema:
+            example: DESC
+        - name: page
+          required: true
+          in: query
+          description: Page number
+          schema:
+            default: 1
+            example: 1
+            type: number
+        - name: pageSize
+          required: true
+          in: query
+          description: Number of items per page
+          schema:
+            maximum: 100
+            default: 10
+            example: 10
+            type: number
+      responses:
+        '200':
+          description: ACU detailed consumption retrieved successfully
+        '400':
+          description: Invalid filter provided
+        '500':
+          description: Internal server error
+      tags:
+        - ACU
+  /user-api/v2/acu-events/unique-users-count:
+    get:
+      operationId: get-unique-users-count
+      summary: Get unique users count from ACU events
+      description: Retrieves the count of unique users based on specified criteria.
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+        - name: groupBy
+          required: true
+          in: query
+          description: Type of grouping that should be used
+          schema:
+            example: month
+      responses:
+        '200':
+          description: Unique users count retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUniqueUsersCountResponse'
+      tags:
+        - ACU
+  /user-api/v2/acu-events/total-consumption:
+    get:
+      operationId: get-total-consumption
+      summary: Get total consumption of ACU events
+      parameters:
+        - name: startDate
+          required: true
+          in: query
+          description: Start date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-01T00:00:00.000Z'
+            type: string
+        - name: endDate
+          required: true
+          in: query
+          description: End date to search ACU events by range date
+          schema:
+            format: date-time
+            example: '2025-01-31T00:00:00.000Z'
+            type: string
+        - name: groupBy
+          required: true
+          in: query
+          description: Type of grouping that should be used
+          schema:
+            example: month
+      responses:
+        '200':
+          description: Total consumption retrieved successfully
+      tags:
+        - ACU
+info:
+  title: /FLOW (flowteam) User API
+  description: This is the API for the User service
+  version: v1.10.19
+  contact: {}
+tags: []
+servers: []
+components:
+  securitySchemes:
+    BearerToken:
+      type: apiKey
+      in: header
+      name: Authorization
+  schemas:
+    CreateUserRoleDto:
+      type: object
+      properties:
+        roleId:
+          type: string
+        roleName:
+          type: string
+      required:
+        - roleId
+        - roleName
+    CreateUserAgentDto:
+      type: object
+      properties:
+        agentId:
+          type: string
+        agentName:
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUserRoleDto'
+      required:
+        - agentId
+        - agentName
+        - roles
+    AppUserMetadataOnboardingDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        interests:
+          type: array
+          items:
+            type: string
+      required:
+        - enabled
+        - interests
+    AppUserMetadataTourDto:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+      required:
+        - enabled
+    AppUserMetadataExternalDto:
+      type: object
+      properties:
+        id:
+          type: string
+      required:
+        - id
+    AppUserMetadataDto:
+      type: object
+      properties:
+        onboarding:
+          $ref: '#/components/schemas/AppUserMetadataOnboardingDto'
+        tour:
+          $ref: '#/components/schemas/AppUserMetadataTourDto'
+        external:
+          $ref: '#/components/schemas/AppUserMetadataExternalDto'
+      required:
+        - onboarding
+        - tour
+        - external
+    CreateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        externalRefId:
+          type: string
+        active:
+          type: boolean
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUserAgentDto'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUserRoleDto'
+        metadata:
+          $ref: '#/components/schemas/AppUserMetadataDto'
+        flowUserId:
+          type: string
+      required:
+        - email
+        - agents
+        - roles
+        - metadata
+    PaginationMeta:
+      type: object
+      properties:
+        totalItems:
+          type: number
+        itemCount:
+          type: number
+        itemsPerPage:
+          type: number
+        totalPages:
+          type: number
+        currentPage:
+          type: number
+      required:
+        - totalItems
+        - itemCount
+        - itemsPerPage
+        - totalPages
+        - currentPage
+    PaginatedResponseDto:
+      type: object
+      properties:
+        meta:
+          $ref: '#/components/schemas/PaginationMeta'
+      required:
+        - meta
+    AppUserRoleDto:
+      type: object
+      properties:
+        id:
+          type: string
+        roleId:
+          type: string
+        roleName:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - roleId
+        - roleName
+        - createdAt
+    AppUserAgentDto:
+      type: object
+      properties:
+        id:
+          type: string
+        agentId:
+          type: string
+        agentName:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppUserRoleDto'
+      required:
+        - id
+        - agentId
+        - agentName
+        - createdAt
+        - roles
+    AppUserDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        externalRefId:
+          type: string
+        active:
+          type: boolean
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppUserAgentDto'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppUserRoleDto'
+        flowUserId:
+          type: string
+      required:
+        - id
+        - name
+        - lastName
+        - email
+        - createdAt
+        - externalRefId
+        - agents
+        - roles
+        - flowUserId
+    GetUserRoleResponse:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+        agents:
+          type: array
+          items:
+            type: string
+      required:
+        - roles
+        - agents
+    UpdateUserEmailDto:
+      type: object
+      properties:
+        email:
+          type: string
+          example: example@email.com
+        newEmail:
+          type: string
+          example: example2@email.com
+      required:
+        - email
+        - newEmail
+    UpdateUserDto:
+      type: object
+      properties:
+        name:
+          type: string
+        lastName:
+          type: string
+        active:
+          type: boolean
+        agents:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUserAgentDto'
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateUserRoleDto'
+        metadata:
+          $ref: '#/components/schemas/AppUserMetadataDto'
+        externalRefId:
+          type: string
+      required:
+        - name
+        - lastName
+        - agents
+        - roles
+        - metadata
+    GetUserGroupsResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+      required:
+        - _id
+        - name
+    AddRoleToUserDto:
+      type: object
+      properties:
+        roles:
+          type: array
+          items:
+            type: string
+      required:
+        - roles
+    Member:
+      type: object
+      properties:
+        email:
+          type: string
+        name:
+          type: string
+      required:
+        - email
+        - name
+    CreateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+      required:
+        - name
+        - members
+    UpdateGroupDto:
+      type: object
+      properties:
+        name:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+        active:
+          type: boolean
+      required:
+        - name
+        - members
+        - active
+    GroupResponsePaginated:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        totalMembers:
+          type: number
+      required:
+        - _id
+        - name
+        - totalMembers
+    GroupResponse:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/Member'
+        active:
+          type: boolean
+      required:
+        - _id
+        - name
+        - members
+        - active
+    CreateApiKeyDto:
+      type: object
+      properties:
+        name:
+          type: string
+        appsToAccess:
+          type: array
+          items:
+            type: string
+      required:
+        - name
+        - appsToAccess
+    ApiKeyDto:
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: string
+        name:
+          type: string
+        appsToAccess:
+          type: array
+          items:
+            type: string
+        clientId:
+          type: string
+        secretHint:
+          type: string
+        active:
+          type: boolean
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+        expiresIn:
+          format: date-time
+          type: string
+      required:
+        - id
+        - userId
+        - name
+        - appsToAccess
+        - clientId
+        - secretHint
+        - active
+        - createdAt
+        - updatedAt
+        - expiresIn
+    TermVersionsDto:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        version:
+          type: string
+        languages:
+          type: array
+          items:
+            type: string
+        tenant:
+          type: string
+        createdAt:
+          format: date-time
+          type: string
+        updatedAt:
+          format: date-time
+          type: string
+      required:
+        - id
+        - name
+        - version
+        - languages
+        - tenant
+        - createdAt
+        - updatedAt
+    CreateFlowMemoryDto:
+      type: object
+      properties: {}
+    FlowMemoryDto:
+      type: object
+      properties:
+        subDomain:
+          type: string
+        ownerId:
+          type: string
+        identifier:
+          type: string
+      required:
+        - subDomain
+        - ownerId
+        - identifier
+    GetUniqueUsersCountResponse:
+      type: object
+      properties:
+        count:
+          type: number
+          example: 32
+        message:
+          type: string
+          example: Unique users count retrieved successfully
+      required:
+        - count
+        - message
+security:
+  - BearerToken: []
